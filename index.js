@@ -1,4 +1,3 @@
-// import { http } from 'http';
 const http = require('http');
 const url = require('url');
 
@@ -11,6 +10,9 @@ const server = http.createServer(function (req, res) {
     console.log("Request is received on path: " + trimmedPath);
 });
 
-server.listen(3000, () => {
+const port = 3000;
+const hostName = "localhost";
+
+server.listen(port, hostName, () => {
     console.log("Listening on port 3000");
 });
