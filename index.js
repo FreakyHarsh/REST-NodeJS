@@ -1,13 +1,36 @@
 const http = require('http');
-const url = require('url');
-
+const { StringDecoder } = require('string_decoder');
 const server = http.createServer(function (req, res) {
-    let parsedUrl = url.parse(req.url, true);
-    let path = parsedUrl.path;
-    let trimmedPath = path.replace(/^\/+|\/+$/g, "");
 
-    res.end("hello world");
-    console.log("Request is received on path: " + trimmedPath);
+    //------------- LEGACY METHOD ----------------
+    // let parsedUrl = url.parse(req.url, true);
+    // console.log(parsedUrl);
+    // let path = parsedUrl.path;
+    // console.log(path);
+    // let trimmedPath = path.replace(/^\/+|\/+$/g, "");
+    // console.log("Request is received on path: " + trimmedPath);
+    // res.end("Req received");
+
+    let myURL = new URL(req.url, "https://localhost:3000");
+    let params = myURL.searchParams;
+    let path = myURL.pathname;
+    let method = req.method;
+    let headers = req.headers;
+
+    // Get the payload, if any 
+    let decoder = new StringDecoder('utf-8');
+    let buffer = '';
+
+    req.on('data', (data) => {
+        buffer += decoder.write(data);
+    });
+    
+    req.on('end', function (){
+        buffer += decoder.end();
+        console.log(`Request receive with payload: ${buffer}`);
+        res.end('response Ends here');
+    });
+
 });
 
 const port = 3000;
