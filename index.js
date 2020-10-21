@@ -1,15 +1,8 @@
 const http = require('http');
 const { StringDecoder } = require('string_decoder');
-const server = http.createServer(function (req, res) {
+const config = require('./config');
 
-    //------------- LEGACY METHOD ----------------
-    // let parsedUrl = url.parse(req.url, true);
-    // console.log(parsedUrl);
-    // let path = parsedUrl.path;
-    // console.log(path);
-    // let trimmedPath = path.replace(/^\/+|\/+$/g, "");
-    // console.log("Request is received on path: " + trimmedPath);
-    // res.end("Req received");
+const server = http.createServer(function (req, res) {
 
     let myURL = new URL(req.url, "https://localhost:3000");
     let params = myURL.searchParams;
@@ -38,25 +31,27 @@ const server = http.createServer(function (req, res) {
         };
         let selectedHandler = typeof (router[path]) !== 'undefined' ? router[path] : handlers.notFound;
 
-        selectedHandler(data, (statusCode = 404, payload = {} ) => {
+        selectedHandler(data, (statusCode = 404, payload = {}) => {
+            res.setHeader('Content-Type', 'application/json');
             res.writeHead(statusCode);
-            res.end(payload);
+            console.log('This is the payload');
+            console.log(payload);
+            res.end(JSON.stringify(payload));
         });
         res.end('response Ends here');
     });
 });
 
-const port = 3000;
 const hostName = "localhost";
 
-server.listen(port, hostName, () => {
-    console.log("Listening on port 3000");
+server.listen(config.port, hostName, () => {
+    console.log(`Listening to port ${hostName}:${config.port} \in ${config.environmentName} mode`);
 });
 
 // Request Handlers
 const handlers = {};
 handlers.getInfo = function (data, callback) {
-    callback(202, {'data': 'This is the data'});
+    callback(202, { 'data': 'This is the data' });
 };
 
 handlers.notFound = function () {
